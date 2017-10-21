@@ -5,8 +5,11 @@ Will help to bypass signature based AV engines while doing red team engagements.
 ## Getting Started
 
 git clone https://github.com/diljithishere/reversehellgo.git
+
 cd reverseshellgo
+
 go build manageShell.go
+
 ./manageShell
 
 Build executable for reverseshell
