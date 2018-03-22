@@ -1,6 +1,9 @@
 # Reverseshell and manager in go lang
   
 Will help to bypass signature based AV engines while doing red team engagements.
+## Please check mask and shadow for more stealthy shells :)
+### https://github.com/diljithishere/mask
+### https://github.com/diljithishere/shadow
 
 ## Getting Started
 
