@@ -1,32 +1,31 @@
-# Reverseshell and manager in go lang
+# Platform independent Reverseshell and Manager in go lang
   
-Will help to bypass signature based AV engines while doing red team engagements.
 ## Please check mask and shadow for more stealthy shells :)
 ### https://github.com/diljithishere/mask
 ### https://github.com/diljithishere/shadow
 
 ## Getting Started
+### git clone https://github.com/diljithishere/reversehellgo.git
+### go get github.com/fatih/color
 
-git clone https://github.com/diljithishere/reversehellgo.git
+#### cd reverseshellgo
+### Build reverseshell
+#### Update your manager ip and port { MANAGERIP := "ip:port" }
+#### GOOS=windows GOARCH=386 go build -o hook.exe reverseshell.go (For windows executable)
+#### go build -o hook reverseshell.go (Linux binary)
 
-cd reverseshellgo
+### Build Manager
+#### go build -o manager.exe manageshell.go (Windows)
+#### go build manageshell.go (Linux)
 
-go build manageShell.go
+### Run manager
+#### ./manageshell
 
-./manageShell
-
-Build executable for reverseshell
-
-**GOOS=windows GOARCH=386 go build -o new.exe reverseshell.go**
-
+##### Will get a hooked prompt after a successfull reverse connection
 
 ### Prerequisites
 
-go 1.9
+#### go 1.9
 
-```
-./manager
-This will wait for the revershell to connect back once connected you can see >> prompt
-If you want to download file from victime supply get command  
->> get creditdetails.txt
-```
+### Author
+#### Diljith S - Initial work - (https://github.com/diljithishere)

